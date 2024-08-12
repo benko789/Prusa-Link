@@ -182,3 +182,8 @@ RESET_ACTIVATED_REGEX = re.compile(r"^Reset mode activated$")
 RESET_DEACTIVATED_REGEX = re.compile(r"^Reset mode deactivated$")
 PP_RECOVER_REGEX = re.compile(r"^// ?action:uvlo_recovery_ready$")
 PP_AUTO_RECOVER_REGEX = re.compile(r"^// ?action:uvlo_auto_recovery_ready$")
+
+
+# Use https://regex101.com/ for quick tests
+# Custom StallGuard2 REGEX 
+STALLGUARD2_REGEX = re.compile(r"SG2 (?P<axis>[A-Z]):(?P<sg>\d+)")

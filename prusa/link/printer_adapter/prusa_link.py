@@ -103,6 +103,7 @@ from .structures.regular_expressions import (
     TM_CAL_END_REGEX,
     TM_CAL_START_REGEX,
     TM_ERROR_LOG_REGEX,
+    STALLGUARD2_REGEX,
 )
 from .telemetry_passer import TelemetryPasser
 from .updatable import Thread
@@ -374,6 +375,9 @@ class PrusaLink:
 
         self.mmu_observer.error_changed_signal.connect(self.mmu_error_changed)
 
+        #   test StallGuard2 Value
+        self.serial_parser.add_decoupled_handler(STALLGUARD2_REGEX,
+                                                 self.log_tm_error)
         self.keepalive.start()
         self.printer_polling.start()
         self.storage_controller.start()
@@ -1102,3 +1106,10 @@ class PrusaLink:
         threshold = float(groups["threshold"])
         log.warning("The hot-end temperature differs from the expected one. "
                     "|%s|>%s", deviation, threshold)
+
+    # Custom handler for StallGuard2 Value
+    def extract_stallguard_value(self, sender, match: re.Match):
+        values = match.groupdict()
+        axis = values["axis"]
+        sg = values["sg"]
+        
