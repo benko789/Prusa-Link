@@ -377,7 +377,7 @@ class PrusaLink:
 
         #   test StallGuard2 Value
         self.serial_parser.add_decoupled_handler(STALLGUARD2_REGEX,
-                                                 self.log_tm_error)
+                                                 self.extract_stallguard_value)
         self.keepalive.start()
         self.printer_polling.start()
         self.storage_controller.start()
@@ -1112,4 +1112,15 @@ class PrusaLink:
         values = match.groupdict()
         axis = values["axis"]
         sg = values["sg"]
-        
+        global all_mqtt_clients
+        for client_name in all_mqtt_clients:
+            # get all required information for influxdb write api
+            client = all_mqtt_clients[client_name]["client"]
+            printer_uuid = "uuid_test"
+            printer_name = "printer_test"
+            log.debug(f"{client_name}/{printer_name}/{printer_uuid}/StallGuard2/{axis}:{sg}")
+            try:
+                client.publish(f"{client_name}/{printer_name}/{printer_uuid}/StallGuard2/{axis}", sg)
+            except Exception as err:
+                log.error(f"MQTT[{client_name}] ERROR: {err}")
+                continue
